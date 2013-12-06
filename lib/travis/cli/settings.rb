@@ -20,6 +20,15 @@ module Travis
           error "Setting you provided does not exist, run travis settings to show available settings" unless valid?(setting)
 
           key, value = setting.split('=')
+          value.strip!
+
+          if value !~ /\Atrue|false\Z/
+            # we handle only boolean values at this point
+            error "Value needs to be either true or false"
+          end
+
+          value = value == "true"
+
           session.raw(:patch, "/repos/#{id}/settings", { :settings => { key => value } }.to_json)
           puts "#{setting.gsub(/=.*$/, '')} was updated to #{value}"
         else
